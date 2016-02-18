@@ -238,7 +238,7 @@ if __name__ == '__main__':
                 space_between_key_and_type = 21 - len(line_out_bgn)
                 data_set.append(line_out_bgn + space_between_key_and_type * " " + "'" + item['value key'] + "'")
 
-    data_set = list(set(data_set))
+    data_set = sorted(list(set(data_set)))
 
     if len(data_set) > 0:
         if output_file == None: 
