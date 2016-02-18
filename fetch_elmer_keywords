@@ -161,6 +161,9 @@ def file_lines_to_hierarchy(HierarchyClass, lines):
                 hierarchy = hierarchy.branches[-1]
             elif leading_spaces[-1] < leading_spaces[-2]:
                 hierarchy = hierarchy.parent
+            if hierarchy == None:
+                print "Warning! Detected a missing hierarchy!"
+                return None
             hierarchy.branches.append(HierarchyClass(line, hierarchy))
     return hierarchy
      
