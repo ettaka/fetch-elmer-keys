@@ -16,9 +16,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='find out the inersection and differences of file lines.')
     parser.add_argument('-f', '--file-paths', nargs=2, help='file names for comparison')
     parser.add_argument('-o', '--output-file', help='output text file name')
+    parser.add_argument('-m', '--output-mode', type=int, choices=xrange(0,3), help='outputmode: 0 = diff01, 1 = diff10 or 2 = intersection')
 
     file_paths = parser.parse_args().file_paths
     output_file = parser.parse_args().output_file
+    output_mode = parser.parse_args().output_mode
 
     data_sets=[]
     
@@ -26,6 +28,10 @@ if __name__ == '__main__':
         data_sets.append([])
         with open(file_path) as f:
             data_sets[-1] = f.readlines()
+
+    for i, data_set in enumerate(data_sets):
+        for j, line in enumerate(data_set):
+            data_sets[i][j] = line.lower()
 
     data_keys = [file_paths[0] + '-' + file_paths[1], 
                  file_paths[1] + '-' + file_paths[0], 
@@ -36,13 +42,16 @@ if __name__ == '__main__':
     output_data[data_keys[2]] = sorted(get_intersection(data_sets[1], data_sets[0]))
     #output_data['union'] = get_union(data_sets[1], data_sets[0])
 
-    
-    for key in data_keys: 
-        print key
-        for value in output_data[key]:
+    if output_mode == None: 
+        for key in data_keys: 
+            print 
+            print key
+            print 79*"="
+            for value in output_data[key]:
+                print value.replace('\n','')
+    else:
+        for value in output_data[data_keys[output_mode]]:
             print value.replace('\n','')
-
-
     
 
 
