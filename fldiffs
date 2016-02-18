@@ -43,15 +43,10 @@ if __name__ == '__main__':
     #output_data['union'] = get_union(data_sets[1], data_sets[0])
 
     if output_mode == None: 
-        for key in data_keys: 
-            print 
-            print key
-            print 79*"="
-            for value in output_data[key]:
-                print value.replace('\n','')
-    else:
-        for value in output_data[data_keys[output_mode]]:
-            print value.replace('\n','')
+        output_mode = 0
+        
+    for value in output_data[data_keys[output_mode]]:
+        print value.replace('\n','')
     
 
 
