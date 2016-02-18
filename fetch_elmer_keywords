@@ -166,6 +166,44 @@ def file_lines_to_hierarchy(HierarchyClass, lines):
                 return None
             hierarchy.branches.append(HierarchyClass(line, hierarchy))
     return hierarchy
+
+def is_comment_line(line, comments_remove_char):
+    test_line = line.lstrip()
+    if len(test_line) > 0:
+        return test_line[0] == comments_remove_char
+    return False
+
+def file_path_to_hierarchy(HierarchyClass, lines, comments_remove_char=None):
+    print "Processing input file path", file_path
+    file_name, file_extension = os.path.splitext(file_path)
+    if file_extension != '.sif': return None
+    elif not os.path.isfile(file_path): 
+        print "Warning! '" + file_path + "' was not found!"
+        return None
+    with open(file_path) as f:
+        lines = f.readlines()
+    if comments_remove_char == None:
+        lines = filter(lambda a: a != '\n', lines)
+    else:
+        lines = filter(lambda a: a != '\n' and not is_comment_line(a, comments_remove_char), lines)
+
+    hierarchy = HierarchyClass(file_path)
+    leading_spaces = []
+    for i, line in enumerate(lines):
+        leading_spaces.append(len(line) - len(line.lstrip()))
+        if i>0:
+            if leading_spaces[-1] > leading_spaces[-2]:
+                if len(hierarchy.branches) == 0:
+                    print "Warning!", hierarchy.key, "failed to create branches."
+                    return None
+                hierarchy = hierarchy.branches[-1]
+            elif leading_spaces[-1] < leading_spaces[-2]:
+                hierarchy = hierarchy.parent
+            if hierarchy == None:
+                print "Warning! Detected a missing hierarchy!"
+                return None
+            hierarchy.branches.append(HierarchyClass(line, hierarchy))
+    return hierarchy
      
        
 if __name__ == '__main__':
@@ -184,16 +222,7 @@ if __name__ == '__main__':
 
     data_set=[]
     for file_path in file_paths:
-        print "Processing input file path", file_path
-        file_name, file_extension = os.path.splitext(file_path)
-        if file_extension != '.sif': continue
-        elif not os.path.isfile(file_path): 
-            print "Warning! '" + file_path + "' was not found!"
-            continue
-        with open(file_path) as f:
-            lines = f.readlines()
-        lines = filter(lambda a: a != '\n', lines)
-        hierarchy = file_lines_to_hierarchy(ElmerSIFHierarchy, lines)
+        hierarchy = file_path_to_hierarchy(ElmerSIFHierarchy, file_path, '!')
         if hierarchy != None:
             hierarchy.convert_to_elmer_type()
             hierarchy.add_json_data_deep()
